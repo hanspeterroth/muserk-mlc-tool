@@ -1,286 +1,32 @@
 (function(){
-  // Inject CSS
-  var style = document.createElement('style');
-  style.textContent = "*{box-sizing:border-box;margin:0;padding:0}\nbody{font-family:'Courier New',monospace;background:#0a0a0a;color:#e0e0e0;min-height:100vh;padding:32px}\nh1{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:#444;margin-bottom:4px}\nh2{font-size:22px;font-weight:700;color:#fff;margin-bottom:6px}\n.sub{font-size:11px;color:#444;margin-bottom:28px;letter-spacing:1px}\n\n/* Search panel */\n.search-panel{background:#0e0e0e;border:1px solid #1a1a1a;padding:20px 24px;margin-bottom:24px;border-radius:2px}\n.mode-tabs{display:flex;gap:0;margin-bottom:18px;border-bottom:1px solid #1a1a1a}\n.mtab{padding:7px 16px;font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;color:#555;border-bottom:2px solid transparent;margin-bottom:-1px}\n.mtab.on{color:#fff;border-bottom-color:#7eb8f7}\n.mtab:hover{color:#aaa}\n.mode{display:none}.mode.on{display:block}\n\n.field-row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:12px}\n.field{display:flex;flex-direction:column;gap:4px}\n.field label{font-size:9px;letter-spacing:2px;color:#555;text-transform:uppercase}\nselect,input[type=text]{background:#141414;border:1px solid #2a2a2a;color:#e0e0e0;padding:8px 10px;font-family:'Courier New',monospace;font-size:11px;outline:none;border-radius:2px}\nselect{min-width:180px}\ninput[type=text]{min-width:220px}\nselect:focus,input[type=text]:focus{border-color:#444}\n\n.criteria-list{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}\n.criteria-row{display:flex;gap:8px;align-items:center}\n.criteria-row select{min-width:160px}\n.criteria-row input{min-width:200px}\n.rm-btn{background:none;border:none;color:#555;cursor:pointer;font-size:14px;padding:0 4px}\n.rm-btn:hover{color:#f77e7e}\n\nbutton{background:#e0e0e0;color:#0a0a0a;border:none;padding:8px 16px;font-family:'Courier New',monospace;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:2px}\nbutton:hover{background:#fff}\nbutton:disabled{background:#1e1e1e;color:#444;cursor:not-allowed}\nbutton.sec{background:#141414;color:#888;border:1px solid #2a2a2a}\nbutton.sec:hover{border-color:#555;color:#ccc}\nbutton.add{background:#141414;color:#7eb8f7;border:1px solid #1a2a3a;font-size:10px;padding:6px 12px}\nbutton.add:hover{border-color:#7eb8f7}\n\n.status{font-size:11px;color:#555;margin-bottom:8px;min-height:16px}\n.status.active{color:#7eb8f7}.status.done{color:#7ef7a0}.status.error{color:#f77e7e}\n.progress-bar{width:100%;height:2px;background:#1a1a1a;margin-bottom:24px}\n.progress-fill{height:100%;background:#7eb8f7;transition:width 0.3s;width:0%}\n\n/* Results */\n.results{display:none}\n.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:20px}\n.card{background:#0e0e0e;border:1px solid #1a1a1a;padding:12px;border-radius:2px}\n.cl{font-size:9px;letter-spacing:2px;color:#555;text-transform:uppercase;margin-bottom:4px}\n.cv{font-size:18px;font-weight:700;color:#fff}\n.cv.warn{color:#f7c97e}.cv.ok{color:#7ef7a0}.cv.blue{color:#7eb8f7}\n\n.rtabs{display:flex;border-bottom:1px solid #1a1a1a;margin-bottom:16px}\n.rtab{padding:7px 14px;font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;color:#555;border-bottom:2px solid transparent;margin-bottom:-1px}\n.rtab.on{color:#fff;border-bottom-color:#fff}.rtab:hover{color:#aaa}\n.rpanel{display:none}.rpanel.on{display:block}\n\n.filter-row{display:flex;gap:8px;margin-bottom:12px;align-items:center;flex-wrap:wrap}\n.filter-row label{font-size:9px;color:#555;letter-spacing:1px}\n.export-row{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}\n\n.table-wrap{overflow-x:auto}\ntable{width:100%;border-collapse:collapse;font-size:11px}\nth{text-align:left;padding:6px 8px;background:#0e0e0e;color:#555;font-weight:400;letter-spacing:1px;text-transform:uppercase;font-size:9px;border-bottom:1px solid #1a1a1a;white-space:nowrap;cursor:pointer;user-select:none}\nth:hover{color:#aaa}\ntd{padding:6px 8px;border-bottom:1px solid #0f0f0f;vertical-align:top}\ntr:hover td{background:#0d0d0d}\n\n.s100{color:#7ef7a0;font-weight:700}.ssub{color:#f7c97e;font-weight:700}.slow{color:#f77e7e;font-weight:700}\n.lvis{color:#7eb8f7}.lnone{color:#f77e7e}\n.tag{display:inline-block;padding:1px 5px;border-radius:1px;font-size:9px;font-weight:700;margin:1px;white-space:nowrap}\n.tU{background:#0d1a2a;color:#7eb8f7}.tS{background:#2a0d0d;color:#f7a07e}\n.tK{background:#0d2a0d;color:#7ef7a0}.tW{background:#2a2a0d;color:#f7f07e}\n.tC{background:#1a0d2a;color:#c07ef7}.tO{background:#1a1a1a;color:#888}\n.tN{background:#2a0d0d;color:#f77e7e}\n\n/* Writer results (simple) */\n.writer-card{background:#111;border:1px solid #1a1a1a;padding:14px 16px;margin-bottom:8px;border-radius:2px;display:flex;gap:16px;align-items:center;cursor:pointer;transition:border-color 0.15s}\n.writer-card:hover{border-color:#444}\n.writer-card .wname{font-size:14px;font-weight:700;color:#fff}\n.writer-card .wmeta{font-size:10px;color:#555;margin-top:3px}\n.writer-card .wbtn{margin-left:auto;background:#141414;color:#7eb8f7;border:1px solid #1a2a3a;padding:6px 12px;font-family:'Courier New',monospace;font-size:9px;font-weight:700;letter-spacing:1px;cursor:pointer;border-radius:2px;white-space:nowrap}\n.writer-card .wbtn:hover{border-color:#7eb8f7}\n\n/* Publisher results */\n.pub-card{background:#111;border:1px solid #1a1a1a;padding:14px 16px;margin-bottom:8px;border-radius:2px}\n.pub-card .pname{font-size:13px;font-weight:700;color:#fff}\n.pub-card .pmeta{font-size:10px;color:#555;margin-top:3px;line-height:1.8}\n\n.hint{font-size:10px;color:#555;margin-bottom:12px;line-height:1.8}\n.hint b{color:#7eb8f7}\n.hint code{background:#1a1a1a;padding:1px 4px;color:#f7c97e;font-size:10px}";
-  document.head.appendChild(style);
+  // Remove existing tool if present
+  var existing = document.getElementById('muserk-mlc-iframe-container');
+  if(existing){ existing.remove(); return; }
 
-  // Create tool container
+  // Create full-screen container
   var container = document.createElement('div');
-  container.id = 'muserk-mlc-tool';
-  container.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:#0a0a0a;z-index:999999;overflow-y:auto;padding:32px;box-sizing:border-box;font-family:Courier New,monospace;';
-  container.innerHTML = "<h1>Muserk BizDev Intelligence</h1>\n<h2>MLC Research Tool</h2>\n<div class=\"sub\">Public Works Database — portal.themlc.com</div>\n\n<div class=\"hint\">\n  <b>SETUP:</b> Must run on <code>https://portal.themlc.com</code> — open DevTools Console, type <code>allow pasting</code>, then paste this entire file's source.<br>\n  <b>OR</b> save as a bookmarklet (see instructions below). Once running, use the search panel to query any writer, work, or publisher.\n</div>\n\n<div class=\"search-panel\">\n  <div class=\"mode-tabs\">\n    <div class=\"mtab on\" onclick=\"setMode('writer',this)\">Writer</div>\n    <div class=\"mtab\" onclick=\"setMode('work',this)\">Work</div>\n    <div class=\"mtab\" onclick=\"setMode('publisher',this)\">Publisher</div>\n  </div>\n\n  <!-- WRITER MODE -->\n  <div class=\"mode on\" id=\"mode-writer\">\n    <div class=\"field-row\">\n      <div class=\"field\">\n        <label>Search by</label>\n        <select id=\"w-by\">\n          <option value=\"ipiNameNumber\">Writer IPI</option>\n          <option value=\"fullName\">Writer Name</option>\n        </select>\n      </div>\n      <div class=\"field\">\n        <label>Value</label>\n        <input type=\"text\" id=\"w-val\" placeholder=\"e.g. 00698491477\" />\n      </div>\n      <button onclick=\"searchWriters()\">Search</button>\n    </div>\n    <div id=\"writer-results\"></div>\n  </div>\n\n  <!-- WORK MODE -->\n  <div class=\"mode\" id=\"mode-work\">\n    <div class=\"hint\" style=\"margin-bottom:14px\">Add one or more criteria. Multiple criteria are combined (AND logic).</div>\n    <div class=\"criteria-list\" id=\"work-criteria\">\n      <div class=\"criteria-row\">\n        <select class=\"wc-key\">\n          <option value=\"combinedTitles\">Work Title</option>\n          <option value=\"writerName\">Writer Name</option>\n          <option value=\"iswc\">ISWC</option>\n          <option value=\"songCode\">MLC Song Code</option>\n          <option value=\"writerIpi\">Writer IPI</option>\n          <option value=\"publisherName\">Publisher Name</option>\n          <option value=\"publisherIpi\">Publisher IPI</option>\n          <option value=\"mlcPublisherNumber\">MLC Publisher Number</option>\n        </select>\n        <input type=\"text\" class=\"wc-val\" placeholder=\"Search value…\" />\n      </div>\n    </div>\n    <div class=\"field-row\">\n      <button class=\"add\" onclick=\"addCriteria()\">+ Add Criteria</button>\n      <button onclick=\"searchWorks()\">Search Works</button>\n    </div>\n    <div id=\"work-results\"></div>\n  </div>\n\n  <!-- PUBLISHER MODE -->\n  <div class=\"mode\" id=\"mode-publisher\">\n    <div class=\"field-row\">\n      <div class=\"field\">\n        <label>Search by</label>\n        <select id=\"p-by\">\n          <option value=\"fullName\">Publisher Name</option>\n          <option value=\"ipiNumber\">Publisher IPI</option>\n          <option value=\"hfaPublisherNumber\">MLC Publisher Number</option>\n        </select>\n      </div>\n      <div class=\"field\">\n        <label>Value</label>\n        <input type=\"text\" id=\"p-val\" placeholder=\"e.g. Universal Music Works\" />\n      </div>\n      <button onclick=\"searchPublishers()\">Search</button>\n    </div>\n    <div id=\"publisher-results\"></div>\n  </div>\n</div>\n\n<div class=\"status\" id=\"status\">Ready.</div>\n<div class=\"progress-bar\"><div class=\"progress-fill\" id=\"pFill\"></div></div>\n\n<!-- CATALOG RESULTS (writer deep-dive) -->\n<div class=\"results\" id=\"results\">\n  <div class=\"cards\">\n    <div class=\"card\"><div class=\"cl\">Total Works</div><div class=\"cv\" id=\"s0\">—</div></div>\n    <div class=\"card\"><div class=\"cl\">100% Claimed</div><div class=\"cv ok\" id=\"s1\">—</div></div>\n    <div class=\"card\"><div class=\"cl\">Sub-100%</div><div class=\"cv warn\" id=\"s2\">—</div></div>\n    <div class=\"card\"><div class=\"cl\">Missing &gt;25%</div><div class=\"cv warn\" id=\"s3\">—</div></div>\n    <div class=\"card\"><div class=\"cl\">Admin Visible</div><div class=\"cv ok\" id=\"s4\">—</div></div>\n    <div class=\"card\"><div class=\"cl\">No Admin</div><div class=\"cv warn\" id=\"s5\">—</div></div>\n    <div class=\"card\"><div class=\"cl\">UMPG Works</div><div class=\"cv blue\" id=\"s6\">—</div></div>\n    <div class=\"card\"><div class=\"cl\">Sony Works</div><div class=\"cv blue\" id=\"s7\">—</div></div>\n  </div>\n\n  <div class=\"rtabs\">\n    <div class=\"rtab on\" onclick=\"showRTab('all',this)\">All Works</div>\n    <div class=\"rtab\" onclick=\"showRTab('sub',this)\">Sub-100%</div>\n    <div class=\"rtab\" onclick=\"showRTab('noadmin',this)\">No Admin</div>\n    <div class=\"rtab\" onclick=\"showRTab('pubs',this)\">Admin Summary</div>\n  </div>\n\n  <div class=\"export-row\">\n    <button class=\"sec\" onclick=\"exportCSV('all')\">Export All → CSV</button>\n    <button class=\"sec\" onclick=\"exportCSV('sub')\">Export Sub-100% → CSV</button>\n    <button class=\"sec\" onclick=\"exportJSON()\">Export Raw JSON</button>\n  </div>\n\n  <div class=\"rpanel on\" id=\"rp-all\">\n    <div class=\"filter-row\">\n      <label>ADMIN:</label>\n      <select id=\"af\" onchange=\"renderAll()\">\n        <option value=\"\">All</option>\n        <option value=\"UMPG\">UMPG</option><option value=\"SONY\">Sony</option>\n        <option value=\"KOBALT\">Kobalt</option><option value=\"WC\">Warner Chappell</option>\n        <option value=\"CONCORD\">Concord</option><option value=\"OTHER\">Other</option>\n      </select>\n      <label>SHARES:</label>\n      <select id=\"sf\" onchange=\"renderAll()\">\n        <option value=\"\">All</option>\n        <option value=\"100\">100%</option><option value=\"sub\">Sub-100%</option>\n        <option value=\"sub50\">Below 50%</option><option value=\"zero\">0%</option>\n      </select>\n      <input type=\"text\" id=\"qf\" placeholder=\"Search title…\" style=\"min-width:150px\" oninput=\"renderAll()\" />\n    </div>\n    <div class=\"table-wrap\"><table>\n      <thead><tr>\n        <th onclick=\"srt('title')\">Title</th><th onclick=\"srt('songCode')\">MLC Code</th>\n        <th onclick=\"srt('iswc')\">ISWC</th><th onclick=\"srt('totalKnownShares')\">Shares%</th>\n        <th>Missing</th><th>Writers</th><th>Admin (this writer)</th><th>All Admins</th>\n        <th onclick=\"srt('rc')\">Recs</th>\n      </tr></thead>\n      <tbody id=\"tb-all\"></tbody>\n    </table></div>\n  </div>\n\n  <div class=\"rpanel\" id=\"rp-sub\">\n    <div class=\"table-wrap\"><table>\n      <thead><tr>\n        <th>Title</th><th>MLC Code</th><th>Shares%</th><th>Missing</th>\n        <th>Writers</th><th>Admin (this writer)</th><th>All Admins</th>\n      </tr></thead>\n      <tbody id=\"tb-sub\"></tbody>\n    </table></div>\n  </div>\n\n  <div class=\"rpanel\" id=\"rp-noadmin\">\n    <div class=\"table-wrap\"><table>\n      <thead><tr>\n        <th>Title</th><th>MLC Code</th><th>Shares%</th><th>Writers</th><th>Registered Admins</th>\n      </tr></thead>\n      <tbody id=\"tb-noadmin\"></tbody>\n    </table></div>\n  </div>\n\n  <div class=\"rpanel\" id=\"rp-pubs\">\n    <div class=\"table-wrap\"><table>\n      <thead><tr>\n        <th>Administrator</th><th>Group</th><th>Works</th><th>Avg Share%</th><th>Sample Works</th>\n      </tr></thead>\n      <tbody id=\"tb-pubs\"></tbody>\n    </table></div>\n  </div>\n</div>";
+  container.id = 'muserk-mlc-iframe-container';
+  container.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:2147483647;background:#0a0a0a;';
   document.body.appendChild(container);
 
-  // Add close button
+  // Close button
   var closeBtn = document.createElement('button');
-  closeBtn.textContent = '✕ Close Tool';
-  closeBtn.style.cssText = 'position:fixed;top:12px;right:12px;z-index:9999999;background:#333;color:#fff;border:1px solid #555;padding:6px 12px;font-family:Courier New,monospace;font-size:11px;cursor:pointer;border-radius:2px;';
-  closeBtn.onclick = function(){ document.getElementById('muserk-mlc-tool').remove(); closeBtn.remove(); };
-  document.body.appendChild(closeBtn);
+  closeBtn.textContent = '✕  Close MLC Tool';
+  closeBtn.style.cssText = 'position:absolute;top:10px;right:10px;z-index:2147483647;background:#333;color:#fff;border:1px solid #555;padding:7px 14px;font-family:Courier New,monospace;font-size:11px;font-weight:700;cursor:pointer;border-radius:2px;letter-spacing:1px;';
+  closeBtn.onmouseover = function(){ this.style.background='#555'; };
+  closeBtn.onmouseout = function(){ this.style.background='#333'; };
+  closeBtn.onclick = function(){ container.remove(); };
+  container.appendChild(closeBtn);
 
-  // Run tool logic
-  const BASE = 'https://api.ptl.themlc.com/api2v/public/search';
-const HDR = {'Content-Type':'application/json','Accept':'application/json','x-requested-with':'XMLHttpRequest','origin':'https://portal.themlc.com','referer':'https://portal.themlc.com/'};
-const post = (ep,body,page=0,size=10) => fetch(`${BASE}/${ep}?page=${page}&size=${size}`,{method:'POST',headers:HDR,body:JSON.stringify(body)}).then(r=>r.json());
+  // Create iframe
+  var iframe = document.createElement('iframe');
+  iframe.style.cssText = 'width:100%;height:100%;border:none;';
+  iframe.setAttribute('sandbox', 'allow-scripts allow-downloads allow-forms allow-same-origin');
+  container.appendChild(iframe);
 
-let W=[], currentIpi=null, sk='title', sa=true;
-
-// ── GROUP DETECTION ──────────────────────────────────────────────────────────
-const GRP={UMPG:['UNIVERSAL MUSIC WORKS','UNIVERSAL MUSIC CORP','UNIVERSAL-POLYGRAM','UNIVERSAL TUNES','SONGS OF UNIVERSAL','UNIVERSAL MUSIC-MGB'],SONY:['SONY/ATV','EMI APRIL MUSIC','EMI BLACKWOOD','SM PUBLISHING UK'],KOBALT:['KOBALT MUSIC'],WC:['WC MUSIC CORP','WARNER CHAPPELL','WARNER-TAMERLANE'],CONCORD:['CONCORD']};
-const grp=n=>{const u=(n||'').toUpperCase();for(const[g,ks]of Object.entries(GRP))if(ks.some(k=>u.includes(k)))return g;return'OTHER';};
-const tCls={UMPG:'tU',SONY:'tS',KOBALT:'tK',WC:'tW',CONCORD:'tC',OTHER:'tO'};
-const tag=n=>{const g=grp(n),s=n.length>24?n.substring(0,22)+'…':n;return`<span class="tag ${tCls[g]}" title="${n}">${s}</span>`;};
-const scCls=s=>s>=99.9?'s100':s>=50?'ssub':'slow';
-
-// ── WRITER DATA HELPERS ──────────────────────────────────────────────────────
-const writerAdmin=(w,ipi)=>{
-  for(const p of(w.originalPublishers||[])){
-    const mine=(p.writers||[]).some(x=>x.ipiNumber===ipi);
-    if(!mine)continue;
-    if(p.administratorPublishers&&p.administratorPublishers.length)return p.administratorPublishers.map(a=>a.publisherName).join(', ');
-    if(p.publisherShare>0)return p.publisherName;
-  }
-  return null;
-};
-const allAdmins=w=>{const s=new Set();for(const p of(w.originalPublishers||[])){if(p.administratorPublishers&&p.administratorPublishers.length)p.administratorPublishers.forEach(a=>s.add(a.publisherName));else if(p.publisherShare>0)s.add(p.publisherName);}return[...s];};
-const wnames=w=>(w.writers||[]).map(x=>x.fullName).join(', ');
-
-// ── UI HELPERS ───────────────────────────────────────────────────────────────
-const setS=(m,c)=>{const el=document.getElementById('status');el.textContent=m;el.className='status '+(c||'');};
-const setPct=p=>{document.getElementById('pFill').style.width=p+'%';};
-const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-
-function setMode(m,el){
-  document.querySelectorAll('.mode').forEach(x=>x.classList.remove('on'));
-  document.querySelectorAll('.mtab').forEach(x=>x.classList.remove('on'));
-  document.getElementById('mode-'+m).classList.add('on');
-  el.classList.add('on');
-}
-
-function addCriteria(){
-  const row=document.createElement('div');
-  row.className='criteria-row';
-  row.innerHTML=`<select class="wc-key">
-    <option value="combinedTitles">Work Title</option>
-    <option value="writerName">Writer Name</option>
-    <option value="iswc">ISWC</option>
-    <option value="songCode">MLC Song Code</option>
-    <option value="writerIpi">Writer IPI</option>
-    <option value="publisherName">Publisher Name</option>
-    <option value="publisherIpi">Publisher IPI</option>
-    <option value="mlcPublisherNumber">MLC Publisher Number</option>
-  </select>
-  <input type="text" class="wc-val" placeholder="Search value…" />
-  <button class="rm-btn" onclick="this.parentElement.remove()">✕</button>`;
-  document.getElementById('work-criteria').appendChild(row);
-}
-
-// ── WRITER SEARCH ────────────────────────────────────────────────────────────
-async function searchWriters(){
-  const by=document.getElementById('w-by').value;
-  const val=document.getElementById('w-val').value.trim();
-  if(!val)return;
-  setS('Searching writers…','active');
-  document.getElementById('writer-results').innerHTML='';
-  try{
-    const d=await post('writers',{[by]:val});
-    if(!d.content||!d.content.length){setS('No writers found.','error');return;}
-    setS(`Found ${d.totalElements} writer(s).`,'done');
-    document.getElementById('writer-results').innerHTML=d.content.map(w=>`
-      <div class="writer-card">
-        <div>
-          <div class="wname">${w.firstName} ${w.lastName}</div>
-          <div class="wmeta">IPI: ${w.ipiNumber||'—'} &nbsp;|&nbsp; IP ID: ${w.ipId} &nbsp;|&nbsp; Works: ${w.worksCount}</div>
-        </div>
-        <button class="wbtn" onclick="fetchCatalog(${w.ipId},'${w.ipiNumber||''}','${w.firstName} ${w.lastName}')">Fetch Catalog →</button>
-      </div>`).join('');
-  }catch(e){setS('Error: '+e.message,'error');}
-}
-
-// ── WORK SEARCH ──────────────────────────────────────────────────────────────
-async function searchWorks(){
-  const rows=[...document.querySelectorAll('.criteria-row')];
-  const body={};
-  for(const r of rows){
-    const k=r.querySelector('.wc-key').value;
-    const v=r.querySelector('.wc-val').value.trim();
-    if(!v)continue;
-    // Writer IPI in work search → need to resolve to ipId first
-    if(k==='writerIpi'){body['writerIpIds']=parseInt(v)||v;}
-    else body[k]=v;
-  }
-  if(!Object.keys(body).length){setS('Enter at least one search value.','error');return;}
-  setS('Searching works…','active');
-  document.getElementById('work-results').innerHTML='';
-  try{
-    const d=await post('works',body);
-    if(!d.content||!d.content.length){setS('No works found.','error');return;}
-    setS(`Found ${d.totalElements} work(s). Showing first ${d.content.length}.`,'done');
-    renderWorkResults(d.content, d.totalElements);
-  }catch(e){setS('Error: '+e.message,'error');}
-}
-
-function renderWorkResults(works, total){
-  const html=`<div style="font-size:10px;color:#555;margin:12px 0">${total} results — showing ${works.length}</div>
-  <div class="table-wrap"><table>
-    <thead><tr><th>Title</th><th>MLC Code</th><th>ISWC</th><th>Shares%</th><th>Writers</th><th>All Admins</th><th>Recs</th></tr></thead>
-    <tbody>${works.map(w=>`<tr>
-      <td>${w.title}</td>
-      <td style="color:#888">${w.songCode}</td>
-      <td style="color:#888;font-size:10px">${w.iswc||'—'}</td>
-      <td class="${scCls(w.totalKnownShares)}">${w.totalKnownShares}%</td>
-      <td style="font-size:10px;color:#666">${wnames(w)}</td>
-      <td>${allAdmins(w).map(tag).join('')||'—'}</td>
-      <td style="color:#888">${w.matchedRecordings?w.matchedRecordings.count:0}</td>
-    </tr>`).join('')}</tbody>
-  </table></div>`;
-  document.getElementById('work-results').innerHTML=html;
-}
-
-// ── PUBLISHER SEARCH ─────────────────────────────────────────────────────────
-async function searchPublishers(){
-  const by=document.getElementById('p-by').value;
-  const val=document.getElementById('p-val').value.trim();
-  if(!val)return;
-  setS('Searching publishers…','active');
-  document.getElementById('publisher-results').innerHTML='';
-  try{
-    const d=await post('publishers',{[by]:val});
-    if(!d.content||!d.content.length){setS('No publishers found.','error');return;}
-    setS(`Found ${d.totalElements} publisher(s).`,'done');
-    document.getElementById('publisher-results').innerHTML=d.content.map(p=>`
-      <div class="pub-card">
-        <div class="pname">${p.publisherName||p.fullName||'—'}</div>
-        <div class="pmeta">
-          IPI: ${p.ipiNumber||'—'} &nbsp;|&nbsp; MLC #: ${p.hfaPublisherNumber||'—'} &nbsp;|&nbsp; IP ID: ${p.ipId||'—'}<br>
-          ${p.totalWorks?'Works: '+p.totalWorks:''}
-          ${p.publicContact?'<br>Contact: '+p.publicContact.email:''}
-        </div>
-      </div>`).join('');
-  }catch(e){setS('Error: '+e.message,'error');}
-}
-
-// ── CATALOG FETCH (writer deep-dive) ─────────────────────────────────────────
-async function fetchCatalog(ipId, ipi, name){
-  W=[];
-  currentIpi=ipi;
-  document.getElementById('results').style.display='none';
-  setPct(0);
-  setS(`Fetching catalog for ${name}…`,'active');
-  try{
-    const d0=await post('works',{writerIpIds:ipId});
-    if(!d0||!d0.content){setS('No works returned.','error');return;}
-    W.push(...d0.content);
-    const pages=d0.totalPages||1;
-    setS(`${d0.totalElements} works, ${pages} pages…`,'active');
-    for(let p=1;p<pages;p++){
-      const d=await post('works',{writerIpIds:ipId},p);
-      if(d&&d.content)W.push(...d.content);
-      setPct(Math.round((p+1)/pages*100));
-      setS(`Page ${p+1}/${pages} — ${W.length} works loaded…`,'active');
-      await sleep(150);
-    }
-    setPct(100);
-    setS(`Complete — ${W.length} works for ${name}.`,'done');
-    document.getElementById('results').style.display='block';
-    renderCatalog();
-  }catch(e){setS('Error: '+e.message,'error');}
-}
-
-// ── CATALOG RENDER ────────────────────────────────────────────────────────────
-function renderCatalog(){
-  // Summary
-  const sub=W.filter(w=>w.totalKnownShares<99.9);
-  document.getElementById('s0').textContent=W.length;
-  document.getElementById('s1').textContent=W.filter(w=>w.totalKnownShares>=99.9).length;
-  document.getElementById('s2').textContent=sub.length;
-  document.getElementById('s3').textContent=W.filter(w=>(100-w.totalKnownShares)>25).length;
-  document.getElementById('s4').textContent=W.filter(w=>writerAdmin(w,currentIpi)!==null).length;
-  document.getElementById('s5').textContent=W.filter(w=>writerAdmin(w,currentIpi)===null).length;
-  document.getElementById('s6').textContent=W.filter(w=>allAdmins(w).some(a=>grp(a)==='UMPG')).length;
-  document.getElementById('s7').textContent=W.filter(w=>allAdmins(w).some(a=>grp(a)==='SONY')).length;
-  renderAll(); renderSub(); renderNoAdmin(); renderPubs();
-}
-
-function renderAll(){
-  const af=document.getElementById('af').value;
-  const sf=document.getElementById('sf').value;
-  const qf=document.getElementById('qf').value.toLowerCase();
-  let ws=[...W].map(w=>({...w,rc:w.matchedRecordings?w.matchedRecordings.count:0}));
-  if(qf)ws=ws.filter(w=>w.title.toLowerCase().includes(qf));
-  if(sf==='100')ws=ws.filter(w=>w.totalKnownShares>=99.9);
-  if(sf==='sub')ws=ws.filter(w=>w.totalKnownShares<99.9);
-  if(sf==='sub50')ws=ws.filter(w=>w.totalKnownShares<50);
-  if(sf==='zero')ws=ws.filter(w=>w.totalKnownShares===0);
-  if(af)ws=ws.filter(w=>allAdmins(w).some(a=>grp(a)===af));
-  ws.sort((a,b)=>{let va=a[sk]??'',vb=b[sk]??'';if(typeof va==='string'){va=va.toLowerCase();vb=vb.toLowerCase();}return sa?(va>vb?1:-1):(va<vb?1:-1);});
-  document.getElementById('tb-all').innerHTML=ws.map(w=>{
-    const la=writerAdmin(w,currentIpi),aa=allAdmins(w);
-    const lc=la?`<span class="lvis">${tag(la)}</span>`:`<span class="tag tN">NOT VISIBLE</span>`;
-    const miss=w.totalKnownShares<99.9?`<span class="slow">−${(100-w.totalKnownShares).toFixed(2)}%</span>`:'';
-    return`<tr><td>${w.title}</td><td style="color:#888">${w.songCode}</td><td style="color:#888;font-size:10px">${w.iswc||'—'}</td><td class="${scCls(w.totalKnownShares)}">${w.totalKnownShares}%</td><td>${miss}</td><td style="font-size:10px;color:#666;max-width:150px">${wnames(w)}</td><td>${lc}</td><td>${aa.map(tag).join('')||'<span style="color:#333">—</span>'}</td><td style="color:#888">${w.rc}</td></tr>`;
-  }).join('');
-}
-
-function renderSub(){
-  const ws=W.filter(w=>w.totalKnownShares<99.9).sort((a,b)=>a.totalKnownShares-b.totalKnownShares);
-  document.getElementById('tb-sub').innerHTML=ws.map(w=>{
-    const la=writerAdmin(w,currentIpi),aa=allAdmins(w);
-    const lc=la?`<span class="lvis">${tag(la)}</span>`:`<span class="tag tN">NOT VISIBLE</span>`;
-    return`<tr><td>${w.title}</td><td style="color:#888">${w.songCode}</td><td class="${scCls(w.totalKnownShares)}">${w.totalKnownShares}%</td><td class="slow">−${(100-w.totalKnownShares).toFixed(2)}%</td><td style="font-size:10px;color:#666">${wnames(w)}</td><td>${lc}</td><td>${aa.map(tag).join('')||'—'}</td></tr>`;
-  }).join('');
-}
-
-function renderNoAdmin(){
-  const ws=W.filter(w=>writerAdmin(w,currentIpi)===null);
-  document.getElementById('tb-noadmin').innerHTML=ws.map(w=>{
-    const aa=allAdmins(w);
-    return`<tr><td>${w.title}</td><td style="color:#888">${w.songCode}</td><td class="${scCls(w.totalKnownShares)}">${w.totalKnownShares}%</td><td style="font-size:10px;color:#666">${wnames(w)}</td><td>${aa.map(tag).join('')||'<span style="color:#333">None</span>'}</td></tr>`;
-  }).join('');
-}
-
-function renderPubs(){
-  const m={};
-  for(const w of W){
-    for(const p of(w.originalPublishers||[])){
-      const ads=p.administratorPublishers&&p.administratorPublishers.length?p.administratorPublishers:(p.publisherShare>0?[p]:[]);
-      for(const a of ads){
-        const n=a.publisherName;if(!n)continue;
-        if(!m[n])m[n]={sh:[],wk:[]};
-        m[n].sh.push(a.publisherShare||0);
-        if(!m[n].wk.includes(w.title))m[n].wk.push(w.title);
-      }
-    }
-  }
-  const rows=Object.entries(m).map(([n,d])=>({n,g:grp(n),c:d.wk.length,avg:d.sh.length?(d.sh.reduce((a,b)=>a+b,0)/d.sh.length).toFixed(1):'—',wk:d.wk})).sort((a,b)=>b.c-a.c);
-  document.getElementById('tb-pubs').innerHTML=rows.map(r=>`<tr><td>${tag(r.n)}</td><td style="color:#555;font-size:10px">${r.g}</td><td>${r.c}</td><td>${r.avg}%</td><td style="font-size:10px;color:#555">${r.wk.slice(0,3).join(', ')+(r.wk.length>3?` +${r.wk.length-3}`:'')}</td></tr>`).join('');
-}
-
-function showRTab(n,el){
-  document.querySelectorAll('.rtab').forEach(t=>t.classList.remove('on'));
-  document.querySelectorAll('.rpanel').forEach(p=>p.classList.remove('on'));
-  el.classList.add('on');
-  document.getElementById('rp-'+n).classList.add('on');
-}
-
-function srt(k){sa=(sk===k)?!sa:true;sk=k;renderAll();}
-
-function exportCSV(f){
-  let ws=f==='sub'?W.filter(w=>w.totalKnownShares<99.9):W;
-  const rows=[['Title','MLC Code','ISWC','Shares%','Missing%','Writers','Admin (writer)','All Admins','Recordings']];
-  for(const w of ws)rows.push([w.title,w.songCode,w.iswc||'',w.totalKnownShares,(100-w.totalKnownShares).toFixed(2),wnames(w),writerAdmin(w,currentIpi)||'NOT VISIBLE',allAdmins(w).join(' | '),w.matchedRecordings?w.matchedRecordings.count:0]);
-  dl('mlc_catalog_'+f+'.csv',rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n'),'text/csv');
-}
-function exportJSON(){dl('mlc_catalog_raw.json',JSON.stringify(W,null,2),'application/json');}
-function dl(fn,c,t){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([c],{type:t}));a.download=fn;a.click();}
-
-// Enter key support
-document.addEventListener('keydown',e=>{
-  if(e.key==='Enter'){
-    const m=document.querySelector('.mode.on').id;
-    if(m==='mode-writer')searchWriters();
-    else if(m==='mode-work')searchWorks();
-    else if(m==='mode-publisher')searchPublishers();
-  }
-});
+  // Write tool HTML into iframe
+  var doc = iframe.contentDocument || iframe.contentWindow.document;
+  doc.open();
+  doc.write("<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n<meta charset=\"UTF-8\">\n<title>MLC Research Tool — Muserk</title>\n<style>\n*{box-sizing:border-box;margin:0;padding:0}\nbody{font-family:'Courier New',monospace;background:#0a0a0a;color:#e0e0e0;min-height:100vh;padding:32px}\nh1{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:#444;margin-bottom:4px}\nh2{font-size:22px;font-weight:700;color:#fff;margin-bottom:6px}\n.sub{font-size:11px;color:#444;margin-bottom:28px;letter-spacing:1px}\n\n/* Search panel */\n.search-panel{background:#0e0e0e;border:1px solid #1a1a1a;padding:20px 24px;margin-bottom:24px;border-radius:2px}\n.mode-tabs{display:flex;gap:0;margin-bottom:18px;border-bottom:1px solid #1a1a1a}\n.mtab{padding:7px 16px;font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;color:#555;border-bottom:2px solid transparent;margin-bottom:-1px}\n.mtab.on{color:#fff;border-bottom-color:#7eb8f7}\n.mtab:hover{color:#aaa}\n.mode{display:none}.mode.on{display:block}\n\n.field-row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:12px}\n.field{display:flex;flex-direction:column;gap:4px}\n.field label{font-size:9px;letter-spacing:2px;color:#555;text-transform:uppercase}\nselect,input[type=text]{background:#141414;border:1px solid #2a2a2a;color:#e0e0e0;padding:8px 10px;font-family:'Courier New',monospace;font-size:11px;outline:none;border-radius:2px}\nselect{min-width:180px}\ninput[type=text]{min-width:220px}\nselect:focus,input[type=text]:focus{border-color:#444}\n\n.criteria-list{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}\n.criteria-row{display:flex;gap:8px;align-items:center}\n.criteria-row select{min-width:160px}\n.criteria-row input{min-width:200px}\n.rm-btn{background:none;border:none;color:#555;cursor:pointer;font-size:14px;padding:0 4px}\n.rm-btn:hover{color:#f77e7e}\n\nbutton{background:#e0e0e0;color:#0a0a0a;border:none;padding:8px 16px;font-family:'Courier New',monospace;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border-radius:2px}\nbutton:hover{background:#fff}\nbutton:disabled{background:#1e1e1e;color:#444;cursor:not-allowed}\nbutton.sec{background:#141414;color:#888;border:1px solid #2a2a2a}\nbutton.sec:hover{border-color:#555;color:#ccc}\nbutton.add{background:#141414;color:#7eb8f7;border:1px solid #1a2a3a;font-size:10px;padding:6px 12px}\nbutton.add:hover{border-color:#7eb8f7}\n\n.status{font-size:11px;color:#555;margin-bottom:8px;min-height:16px}\n.status.active{color:#7eb8f7}.status.done{color:#7ef7a0}.status.error{color:#f77e7e}\n.progress-bar{width:100%;height:2px;background:#1a1a1a;margin-bottom:24px}\n.progress-fill{height:100%;background:#7eb8f7;transition:width 0.3s;width:0%}\n\n/* Results */\n.results{display:none}\n.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:20px}\n.card{background:#0e0e0e;border:1px solid #1a1a1a;padding:12px;border-radius:2px}\n.cl{font-size:9px;letter-spacing:2px;color:#555;text-transform:uppercase;margin-bottom:4px}\n.cv{font-size:18px;font-weight:700;color:#fff}\n.cv.warn{color:#f7c97e}.cv.ok{color:#7ef7a0}.cv.blue{color:#7eb8f7}\n\n.rtabs{display:flex;border-bottom:1px solid #1a1a1a;margin-bottom:16px}\n.rtab{padding:7px 14px;font-size:10px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;color:#555;border-bottom:2px solid transparent;margin-bottom:-1px}\n.rtab.on{color:#fff;border-bottom-color:#fff}.rtab:hover{color:#aaa}\n.rpanel{display:none}.rpanel.on{display:block}\n\n.filter-row{display:flex;gap:8px;margin-bottom:12px;align-items:center;flex-wrap:wrap}\n.filter-row label{font-size:9px;color:#555;letter-spacing:1px}\n.export-row{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}\n\n.table-wrap{overflow-x:auto}\ntable{width:100%;border-collapse:collapse;font-size:11px}\nth{text-align:left;padding:6px 8px;background:#0e0e0e;color:#555;font-weight:400;letter-spacing:1px;text-transform:uppercase;font-size:9px;border-bottom:1px solid #1a1a1a;white-space:nowrap;cursor:pointer;user-select:none}\nth:hover{color:#aaa}\ntd{padding:6px 8px;border-bottom:1px solid #0f0f0f;vertical-align:top}\ntr:hover td{background:#0d0d0d}\n\n.s100{color:#7ef7a0;font-weight:700}.ssub{color:#f7c97e;font-weight:700}.slow{color:#f77e7e;font-weight:700}\n.lvis{color:#7eb8f7}.lnone{color:#f77e7e}\n.tag{display:inline-block;padding:1px 5px;border-radius:1px;font-size:9px;font-weight:700;margin:1px;white-space:nowrap}\n.tU{background:#0d1a2a;color:#7eb8f7}.tS{background:#2a0d0d;color:#f7a07e}\n.tK{background:#0d2a0d;color:#7ef7a0}.tW{background:#2a2a0d;color:#f7f07e}\n.tC{background:#1a0d2a;color:#c07ef7}.tO{background:#1a1a1a;color:#888}\n.tN{background:#2a0d0d;color:#f77e7e}\n\n/* Writer results (simple) */\n.writer-card{background:#111;border:1px solid #1a1a1a;padding:14px 16px;margin-bottom:8px;border-radius:2px;display:flex;gap:16px;align-items:center;cursor:pointer;transition:border-color 0.15s}\n.writer-card:hover{border-color:#444}\n.writer-card .wname{font-size:14px;font-weight:700;color:#fff}\n.writer-card .wmeta{font-size:10px;color:#555;margin-top:3px}\n.writer-card .wbtn{margin-left:auto;background:#141414;color:#7eb8f7;border:1px solid #1a2a3a;padding:6px 12px;font-family:'Courier New',monospace;font-size:9px;font-weight:700;letter-spacing:1px;cursor:pointer;border-radius:2px;white-space:nowrap}\n.writer-card .wbtn:hover{border-color:#7eb8f7}\n\n/* Publisher results */\n.pub-card{background:#111;border:1px solid #1a1a1a;padding:14px 16px;margin-bottom:8px;border-radius:2px}\n.pub-card .pname{font-size:13px;font-weight:700;color:#fff}\n.pub-card .pmeta{font-size:10px;color:#555;margin-top:3px;line-height:1.8}\n\n.hint{font-size:10px;color:#555;margin-bottom:12px;line-height:1.8}\n.hint b{color:#7eb8f7}\n.hint code{background:#1a1a1a;padding:1px 4px;color:#f7c97e;font-size:10px}\n</style>\n</head>\n<body>\n<h1>Muserk BizDev Intelligence</h1>\n<h2>MLC Research Tool</h2>\n<div class=\"sub\">Public Works Database — portal.themlc.com</div>\n\n<div class=\"search-panel\">\n  <div class=\"mode-tabs\">\n    <div class=\"mtab on\" onclick=\"setMode('writer',this)\">Writer</div>\n    <div class=\"mtab\" onclick=\"setMode('work',this)\">Work</div>\n    <div class=\"mtab\" onclick=\"setMode('publisher',this)\">Publisher</div>\n  </div>\n\n  <!-- WRITER MODE -->\n  <div class=\"mode on\" id=\"mode-writer\">\n    <div class=\"field-row\">\n      <div class=\"field\">\n        <label>Search by</label>\n        <select id=\"w-by\">\n          <option value=\"ipiNameNumber\">Writer IPI</option>\n          <option value=\"fullName\">Writer Name</option>\n        </select>\n      </div>\n      <div class=\"field\">\n        <label>Value</label>\n        <input type=\"text\" id=\"w-val\" placeholder=\"e.g. 00698491477\" />\n      </div>\n      <button onclick=\"searchWriters()\">Search</button>\n    </div>\n    <div id=\"writer-results\"></div>\n  </div>\n\n  <!-- WORK MODE -->\n  <div class=\"mode\" id=\"mode-work\">\n    <div class=\"hint\" style=\"margin-bottom:14px\">Add one or more criteria. Multiple criteria are combined (AND logic).</div>\n    <div class=\"criteria-list\" id=\"work-criteria\">\n      <div class=\"criteria-row\">\n        <select class=\"wc-key\">\n          <option value=\"combinedTitles\">Work Title</option>\n          <option value=\"writerName\">Writer Name</option>\n          <option value=\"iswc\">ISWC</option>\n          <option value=\"songCode\">MLC Song Code</option>\n          <option value=\"writerIpi\">Writer IPI</option>\n          <option value=\"publisherName\">Publisher Name</option>\n          <option value=\"publisherIpi\">Publisher IPI</option>\n          <option value=\"mlcPublisherNumber\">MLC Publisher Number</option>\n        </select>\n        <input type=\"text\" class=\"wc-val\" placeholder=\"Search value…\" />\n      </div>\n    </div>\n    <div class=\"field-row\">\n      <button class=\"add\" onclick=\"addCriteria()\">+ Add Criteria</button>\n      <button onclick=\"searchWorks()\">Search Works</button>\n    </div>\n    <div id=\"work-results\"></div>\n  </div>\n\n  <!-- PUBLISHER MODE -->\n  <div class=\"mode\" id=\"mode-publisher\">\n    <div class=\"field-row\">\n      <div class=\"field\">\n        <label>Search by</label>\n        <select id=\"p-by\">\n          <option value=\"fullName\">Publisher Name</option>\n          <option value=\"ipiNumber\">Publisher IPI</option>\n          <option value=\"hfaPublisherNumber\">MLC Publisher Number</option>\n        </select>\n      </div>\n      <div class=\"field\">\n        <label>Value</label>\n        <input type=\"text\" id=\"p-val\" placeholder=\"e.g. Universal Music Works\" />\n      </div>\n      <button onclick=\"searchPublishers()\">Search</button>\n    </div>\n    <div id=\"publisher-results\"></div>\n  </div>\n</div>\n\n<div class=\"status\" id=\"status\">Ready.</div>\n<div class=\"progress-bar\"><div class=\"progress-fill\" id=\"pFill\"></div></div>\n\n<!-- CATALOG RESULTS (writer deep-dive) -->\n<div class=\"results\" id=\"results\">\n  <div class=\"cards\">\n    <div class=\"card\"><div class=\"cl\">Total Works</div><div class=\"cv\" id=\"s0\">—</div></div>\n    <div class=\"card\"><div class=\"cl\">100% Claimed</div><div class=\"cv ok\" id=\"s1\">—</div></div>\n    <div class=\"card\"><div class=\"cl\">Sub-100%</div><div class=\"cv warn\" id=\"s2\">—</div></div>\n    <div class=\"card\"><div class=\"cl\">Missing &gt;25%</div><div class=\"cv warn\" id=\"s3\">—</div></div>\n    <div class=\"card\"><div class=\"cl\">Admin Visible</div><div class=\"cv ok\" id=\"s4\">—</div></div>\n    <div class=\"card\"><div class=\"cl\">No Admin</div><div class=\"cv warn\" id=\"s5\">—</div></div>\n    <div class=\"card\"><div class=\"cl\">UMPG Works</div><div class=\"cv blue\" id=\"s6\">—</div></div>\n    <div class=\"card\"><div class=\"cl\">Sony Works</div><div class=\"cv blue\" id=\"s7\">—</div></div>\n  </div>\n\n  <div class=\"rtabs\">\n    <div class=\"rtab on\" onclick=\"showRTab('all',this)\">All Works</div>\n    <div class=\"rtab\" onclick=\"showRTab('sub',this)\">Sub-100%</div>\n    <div class=\"rtab\" onclick=\"showRTab('noadmin',this)\">No Admin</div>\n    <div class=\"rtab\" onclick=\"showRTab('pubs',this)\">Admin Summary</div>\n  </div>\n\n  <div class=\"export-row\">\n    <button class=\"sec\" onclick=\"exportCSV('all')\">Export All → CSV</button>\n    <button class=\"sec\" onclick=\"exportCSV('sub')\">Export Sub-100% → CSV</button>\n    <button class=\"sec\" onclick=\"exportJSON()\">Export Raw JSON</button>\n  </div>\n\n  <div class=\"rpanel on\" id=\"rp-all\">\n    <div class=\"filter-row\">\n      <label>ADMIN:</label>\n      <select id=\"af\" onchange=\"renderAll()\">\n        <option value=\"\">All</option>\n        <option value=\"UMPG\">UMPG</option><option value=\"SONY\">Sony</option>\n        <option value=\"KOBALT\">Kobalt</option><option value=\"WC\">Warner Chappell</option>\n        <option value=\"CONCORD\">Concord</option><option value=\"OTHER\">Other</option>\n      </select>\n      <label>SHARES:</label>\n      <select id=\"sf\" onchange=\"renderAll()\">\n        <option value=\"\">All</option>\n        <option value=\"100\">100%</option><option value=\"sub\">Sub-100%</option>\n        <option value=\"sub50\">Below 50%</option><option value=\"zero\">0%</option>\n      </select>\n      <input type=\"text\" id=\"qf\" placeholder=\"Search title…\" style=\"min-width:150px\" oninput=\"renderAll()\" />\n    </div>\n    <div class=\"table-wrap\"><table>\n      <thead><tr>\n        <th onclick=\"srt('title')\">Title</th><th onclick=\"srt('songCode')\">MLC Code</th>\n        <th onclick=\"srt('iswc')\">ISWC</th><th onclick=\"srt('totalKnownShares')\">Shares%</th>\n        <th>Missing</th><th>Writers</th><th>Admin (this writer)</th><th>All Admins</th>\n        <th onclick=\"srt('rc')\">Recs</th>\n      </tr></thead>\n      <tbody id=\"tb-all\"></tbody>\n    </table></div>\n  </div>\n\n  <div class=\"rpanel\" id=\"rp-sub\">\n    <div class=\"table-wrap\"><table>\n      <thead><tr>\n        <th>Title</th><th>MLC Code</th><th>Shares%</th><th>Missing</th>\n        <th>Writers</th><th>Admin (this writer)</th><th>All Admins</th>\n      </tr></thead>\n      <tbody id=\"tb-sub\"></tbody>\n    </table></div>\n  </div>\n\n  <div class=\"rpanel\" id=\"rp-noadmin\">\n    <div class=\"table-wrap\"><table>\n      <thead><tr>\n        <th>Title</th><th>MLC Code</th><th>Shares%</th><th>Writers</th><th>Registered Admins</th>\n      </tr></thead>\n      <tbody id=\"tb-noadmin\"></tbody>\n    </table></div>\n  </div>\n\n  <div class=\"rpanel\" id=\"rp-pubs\">\n    <div class=\"table-wrap\"><table>\n      <thead><tr>\n        <th>Administrator</th><th>Group</th><th>Works</th><th>Avg Share%</th><th>Sample Works</th>\n      </tr></thead>\n      <tbody id=\"tb-pubs\"></tbody>\n    </table></div>\n  </div>\n</div>\n\n<script>\nconst BASE = 'https://api.ptl.themlc.com/api2v/public/search';\nconst HDR = {'Content-Type':'application/json','Accept':'application/json','x-requested-with':'XMLHttpRequest','origin':'https://portal.themlc.com','referer':'https://portal.themlc.com/'};\nconst post = (ep,body,page=0,size=10) => fetch(`${BASE}/${ep}?page=${page}&size=${size}`,{method:'POST',headers:HDR,body:JSON.stringify(body)}).then(r=>r.json());\n\nlet W=[], currentIpi=null, sk='title', sa=true;\n\n// ── GROUP DETECTION ──────────────────────────────────────────────────────────\nconst GRP={UMPG:['UNIVERSAL MUSIC WORKS','UNIVERSAL MUSIC CORP','UNIVERSAL-POLYGRAM','UNIVERSAL TUNES','SONGS OF UNIVERSAL','UNIVERSAL MUSIC-MGB'],SONY:['SONY/ATV','EMI APRIL MUSIC','EMI BLACKWOOD','SM PUBLISHING UK'],KOBALT:['KOBALT MUSIC'],WC:['WC MUSIC CORP','WARNER CHAPPELL','WARNER-TAMERLANE'],CONCORD:['CONCORD']};\nconst grp=n=>{const u=(n||'').toUpperCase();for(const[g,ks]of Object.entries(GRP))if(ks.some(k=>u.includes(k)))return g;return'OTHER';};\nconst tCls={UMPG:'tU',SONY:'tS',KOBALT:'tK',WC:'tW',CONCORD:'tC',OTHER:'tO'};\nconst tag=n=>{const g=grp(n),s=n.length>24?n.substring(0,22)+'…':n;return`<span class=\"tag ${tCls[g]}\" title=\"${n}\">${s}</span>`;};\nconst scCls=s=>s>=99.9?'s100':s>=50?'ssub':'slow';\n\n// ── WRITER DATA HELPERS ──────────────────────────────────────────────────────\nconst writerAdmin=(w,ipi)=>{\n  for(const p of(w.originalPublishers||[])){\n    const mine=(p.writers||[]).some(x=>x.ipiNumber===ipi);\n    if(!mine)continue;\n    if(p.administratorPublishers&&p.administratorPublishers.length)return p.administratorPublishers.map(a=>a.publisherName).join(', ');\n    if(p.publisherShare>0)return p.publisherName;\n  }\n  return null;\n};\nconst allAdmins=w=>{const s=new Set();for(const p of(w.originalPublishers||[])){if(p.administratorPublishers&&p.administratorPublishers.length)p.administratorPublishers.forEach(a=>s.add(a.publisherName));else if(p.publisherShare>0)s.add(p.publisherName);}return[...s];};\nconst wnames=w=>(w.writers||[]).map(x=>x.fullName).join(', ');\n\n// ── UI HELPERS ───────────────────────────────────────────────────────────────\nconst setS=(m,c)=>{const el=document.getElementById('status');el.textContent=m;el.className='status '+(c||'');};\nconst setPct=p=>{document.getElementById('pFill').style.width=p+'%';};\nconst sleep=ms=>new Promise(r=>setTimeout(r,ms));\n\nfunction setMode(m,el){\n  document.querySelectorAll('.mode').forEach(x=>x.classList.remove('on'));\n  document.querySelectorAll('.mtab').forEach(x=>x.classList.remove('on'));\n  document.getElementById('mode-'+m).classList.add('on');\n  el.classList.add('on');\n}\n\nfunction addCriteria(){\n  const row=document.createElement('div');\n  row.className='criteria-row';\n  row.innerHTML=`<select class=\"wc-key\">\n    <option value=\"combinedTitles\">Work Title</option>\n    <option value=\"writerName\">Writer Name</option>\n    <option value=\"iswc\">ISWC</option>\n    <option value=\"songCode\">MLC Song Code</option>\n    <option value=\"writerIpi\">Writer IPI</option>\n    <option value=\"publisherName\">Publisher Name</option>\n    <option value=\"publisherIpi\">Publisher IPI</option>\n    <option value=\"mlcPublisherNumber\">MLC Publisher Number</option>\n  </select>\n  <input type=\"text\" class=\"wc-val\" placeholder=\"Search value…\" />\n  <button class=\"rm-btn\" onclick=\"this.parentElement.remove()\">✕</button>`;\n  document.getElementById('work-criteria').appendChild(row);\n}\n\n// ── WRITER SEARCH ────────────────────────────────────────────────────────────\nasync function searchWriters(){\n  const by=document.getElementById('w-by').value;\n  const val=document.getElementById('w-val').value.trim();\n  if(!val)return;\n  setS('Searching writers…','active');\n  document.getElementById('writer-results').innerHTML='';\n  try{\n    const d=await post('writers',{[by]:val});\n    if(!d.content||!d.content.length){setS('No writers found.','error');return;}\n    setS(`Found ${d.totalElements} writer(s).`,'done');\n    document.getElementById('writer-results').innerHTML=d.content.map(w=>`\n      <div class=\"writer-card\">\n        <div>\n          <div class=\"wname\">${w.firstName} ${w.lastName}</div>\n          <div class=\"wmeta\">IPI: ${w.ipiNumber||'—'} &nbsp;|&nbsp; IP ID: ${w.ipId} &nbsp;|&nbsp; Works: ${w.worksCount}</div>\n        </div>\n        <button class=\"wbtn\" onclick=\"fetchCatalog(${w.ipId},'${w.ipiNumber||''}','${w.firstName} ${w.lastName}')\">Fetch Catalog →</button>\n      </div>`).join('');\n  }catch(e){setS('Error: '+e.message,'error');}\n}\n\n// ── WORK SEARCH ──────────────────────────────────────────────────────────────\nasync function searchWorks(){\n  const rows=[...document.querySelectorAll('.criteria-row')];\n  const body={};\n  for(const r of rows){\n    const k=r.querySelector('.wc-key').value;\n    const v=r.querySelector('.wc-val').value.trim();\n    if(!v)continue;\n    // Writer IPI in work search → need to resolve to ipId first\n    if(k==='writerIpi'){body['writerIpIds']=parseInt(v)||v;}\n    else body[k]=v;\n  }\n  if(!Object.keys(body).length){setS('Enter at least one search value.','error');return;}\n  setS('Searching works…','active');\n  document.getElementById('work-results').innerHTML='';\n  try{\n    const d=await post('works',body);\n    if(!d.content||!d.content.length){setS('No works found.','error');return;}\n    setS(`Found ${d.totalElements} work(s). Showing first ${d.content.length}.`,'done');\n    renderWorkResults(d.content, d.totalElements);\n  }catch(e){setS('Error: '+e.message,'error');}\n}\n\nfunction renderWorkResults(works, total){\n  const html=`<div style=\"font-size:10px;color:#555;margin:12px 0\">${total} results — showing ${works.length}</div>\n  <div class=\"table-wrap\"><table>\n    <thead><tr><th>Title</th><th>MLC Code</th><th>ISWC</th><th>Shares%</th><th>Writers</th><th>All Admins</th><th>Recs</th></tr></thead>\n    <tbody>${works.map(w=>`<tr>\n      <td>${w.title}</td>\n      <td style=\"color:#888\">${w.songCode}</td>\n      <td style=\"color:#888;font-size:10px\">${w.iswc||'—'}</td>\n      <td class=\"${scCls(w.totalKnownShares)}\">${w.totalKnownShares}%</td>\n      <td style=\"font-size:10px;color:#666\">${wnames(w)}</td>\n      <td>${allAdmins(w).map(tag).join('')||'—'}</td>\n      <td style=\"color:#888\">${w.matchedRecordings?w.matchedRecordings.count:0}</td>\n    </tr>`).join('')}</tbody>\n  </table></div>`;\n  document.getElementById('work-results').innerHTML=html;\n}\n\n// ── PUBLISHER SEARCH ─────────────────────────────────────────────────────────\nasync function searchPublishers(){\n  const by=document.getElementById('p-by').value;\n  const val=document.getElementById('p-val').value.trim();\n  if(!val)return;\n  setS('Searching publishers…','active');\n  document.getElementById('publisher-results').innerHTML='';\n  try{\n    const d=await post('publishers',{[by]:val});\n    if(!d.content||!d.content.length){setS('No publishers found.','error');return;}\n    setS(`Found ${d.totalElements} publisher(s).`,'done');\n    document.getElementById('publisher-results').innerHTML=d.content.map(p=>`\n      <div class=\"pub-card\">\n        <div class=\"pname\">${p.publisherName||p.fullName||'—'}</div>\n        <div class=\"pmeta\">\n          IPI: ${p.ipiNumber||'—'} &nbsp;|&nbsp; MLC #: ${p.hfaPublisherNumber||'—'} &nbsp;|&nbsp; IP ID: ${p.ipId||'—'}<br>\n          ${p.totalWorks?'Works: '+p.totalWorks:''}\n          ${p.publicContact?'<br>Contact: '+p.publicContact.email:''}\n        </div>\n      </div>`).join('');\n  }catch(e){setS('Error: '+e.message,'error');}\n}\n\n// ── CATALOG FETCH (writer deep-dive) ─────────────────────────────────────────\nasync function fetchCatalog(ipId, ipi, name){\n  W=[];\n  currentIpi=ipi;\n  document.getElementById('results').style.display='none';\n  setPct(0);\n  setS(`Fetching catalog for ${name}…`,'active');\n  try{\n    const d0=await post('works',{writerIpIds:ipId});\n    if(!d0||!d0.content){setS('No works returned.','error');return;}\n    W.push(...d0.content);\n    const pages=d0.totalPages||1;\n    setS(`${d0.totalElements} works, ${pages} pages…`,'active');\n    for(let p=1;p<pages;p++){\n      const d=await post('works',{writerIpIds:ipId},p);\n      if(d&&d.content)W.push(...d.content);\n      setPct(Math.round((p+1)/pages*100));\n      setS(`Page ${p+1}/${pages} — ${W.length} works loaded…`,'active');\n      await sleep(150);\n    }\n    setPct(100);\n    setS(`Complete — ${W.length} works for ${name}.`,'done');\n    document.getElementById('results').style.display='block';\n    renderCatalog();\n  }catch(e){setS('Error: '+e.message,'error');}\n}\n\n// ── CATALOG RENDER ────────────────────────────────────────────────────────────\nfunction renderCatalog(){\n  // Summary\n  const sub=W.filter(w=>w.totalKnownShares<99.9);\n  document.getElementById('s0').textContent=W.length;\n  document.getElementById('s1').textContent=W.filter(w=>w.totalKnownShares>=99.9).length;\n  document.getElementById('s2').textContent=sub.length;\n  document.getElementById('s3').textContent=W.filter(w=>(100-w.totalKnownShares)>25).length;\n  document.getElementById('s4').textContent=W.filter(w=>writerAdmin(w,currentIpi)!==null).length;\n  document.getElementById('s5').textContent=W.filter(w=>writerAdmin(w,currentIpi)===null).length;\n  document.getElementById('s6').textContent=W.filter(w=>allAdmins(w).some(a=>grp(a)==='UMPG')).length;\n  document.getElementById('s7').textContent=W.filter(w=>allAdmins(w).some(a=>grp(a)==='SONY')).length;\n  renderAll(); renderSub(); renderNoAdmin(); renderPubs();\n}\n\nfunction renderAll(){\n  const af=document.getElementById('af').value;\n  const sf=document.getElementById('sf').value;\n  const qf=document.getElementById('qf').value.toLowerCase();\n  let ws=[...W].map(w=>({...w,rc:w.matchedRecordings?w.matchedRecordings.count:0}));\n  if(qf)ws=ws.filter(w=>w.title.toLowerCase().includes(qf));\n  if(sf==='100')ws=ws.filter(w=>w.totalKnownShares>=99.9);\n  if(sf==='sub')ws=ws.filter(w=>w.totalKnownShares<99.9);\n  if(sf==='sub50')ws=ws.filter(w=>w.totalKnownShares<50);\n  if(sf==='zero')ws=ws.filter(w=>w.totalKnownShares===0);\n  if(af)ws=ws.filter(w=>allAdmins(w).some(a=>grp(a)===af));\n  ws.sort((a,b)=>{let va=a[sk]??'',vb=b[sk]??'';if(typeof va==='string'){va=va.toLowerCase();vb=vb.toLowerCase();}return sa?(va>vb?1:-1):(va<vb?1:-1);});\n  document.getElementById('tb-all').innerHTML=ws.map(w=>{\n    const la=writerAdmin(w,currentIpi),aa=allAdmins(w);\n    const lc=la?`<span class=\"lvis\">${tag(la)}</span>`:`<span class=\"tag tN\">NOT VISIBLE</span>`;\n    const miss=w.totalKnownShares<99.9?`<span class=\"slow\">−${(100-w.totalKnownShares).toFixed(2)}%</span>`:'';\n    return`<tr><td>${w.title}</td><td style=\"color:#888\">${w.songCode}</td><td style=\"color:#888;font-size:10px\">${w.iswc||'—'}</td><td class=\"${scCls(w.totalKnownShares)}\">${w.totalKnownShares}%</td><td>${miss}</td><td style=\"font-size:10px;color:#666;max-width:150px\">${wnames(w)}</td><td>${lc}</td><td>${aa.map(tag).join('')||'<span style=\"color:#333\">—</span>'}</td><td style=\"color:#888\">${w.rc}</td></tr>`;\n  }).join('');\n}\n\nfunction renderSub(){\n  const ws=W.filter(w=>w.totalKnownShares<99.9).sort((a,b)=>a.totalKnownShares-b.totalKnownShares);\n  document.getElementById('tb-sub').innerHTML=ws.map(w=>{\n    const la=writerAdmin(w,currentIpi),aa=allAdmins(w);\n    const lc=la?`<span class=\"lvis\">${tag(la)}</span>`:`<span class=\"tag tN\">NOT VISIBLE</span>`;\n    return`<tr><td>${w.title}</td><td style=\"color:#888\">${w.songCode}</td><td class=\"${scCls(w.totalKnownShares)}\">${w.totalKnownShares}%</td><td class=\"slow\">−${(100-w.totalKnownShares).toFixed(2)}%</td><td style=\"font-size:10px;color:#666\">${wnames(w)}</td><td>${lc}</td><td>${aa.map(tag).join('')||'—'}</td></tr>`;\n  }).join('');\n}\n\nfunction renderNoAdmin(){\n  const ws=W.filter(w=>writerAdmin(w,currentIpi)===null);\n  document.getElementById('tb-noadmin').innerHTML=ws.map(w=>{\n    const aa=allAdmins(w);\n    return`<tr><td>${w.title}</td><td style=\"color:#888\">${w.songCode}</td><td class=\"${scCls(w.totalKnownShares)}\">${w.totalKnownShares}%</td><td style=\"font-size:10px;color:#666\">${wnames(w)}</td><td>${aa.map(tag).join('')||'<span style=\"color:#333\">None</span>'}</td></tr>`;\n  }).join('');\n}\n\nfunction renderPubs(){\n  const m={};\n  for(const w of W){\n    for(const p of(w.originalPublishers||[])){\n      const ads=p.administratorPublishers&&p.administratorPublishers.length?p.administratorPublishers:(p.publisherShare>0?[p]:[]);\n      for(const a of ads){\n        const n=a.publisherName;if(!n)continue;\n        if(!m[n])m[n]={sh:[],wk:[]};\n        m[n].sh.push(a.publisherShare||0);\n        if(!m[n].wk.includes(w.title))m[n].wk.push(w.title);\n      }\n    }\n  }\n  const rows=Object.entries(m).map(([n,d])=>({n,g:grp(n),c:d.wk.length,avg:d.sh.length?(d.sh.reduce((a,b)=>a+b,0)/d.sh.length).toFixed(1):'—',wk:d.wk})).sort((a,b)=>b.c-a.c);\n  document.getElementById('tb-pubs').innerHTML=rows.map(r=>`<tr><td>${tag(r.n)}</td><td style=\"color:#555;font-size:10px\">${r.g}</td><td>${r.c}</td><td>${r.avg}%</td><td style=\"font-size:10px;color:#555\">${r.wk.slice(0,3).join(', ')+(r.wk.length>3?` +${r.wk.length-3}`:'')}</td></tr>`).join('');\n}\n\nfunction showRTab(n,el){\n  document.querySelectorAll('.rtab').forEach(t=>t.classList.remove('on'));\n  document.querySelectorAll('.rpanel').forEach(p=>p.classList.remove('on'));\n  el.classList.add('on');\n  document.getElementById('rp-'+n).classList.add('on');\n}\n\nfunction srt(k){sa=(sk===k)?!sa:true;sk=k;renderAll();}\n\nfunction exportCSV(f){\n  let ws=f==='sub'?W.filter(w=>w.totalKnownShares<99.9):W;\n  const rows=[['Title','MLC Code','ISWC','Shares%','Missing%','Writers','Admin (writer)','All Admins','Recordings']];\n  for(const w of ws)rows.push([w.title,w.songCode,w.iswc||'',w.totalKnownShares,(100-w.totalKnownShares).toFixed(2),wnames(w),writerAdmin(w,currentIpi)||'NOT VISIBLE',allAdmins(w).join(' | '),w.matchedRecordings?w.matchedRecordings.count:0]);\n  dl('mlc_catalog_'+f+'.csv',rows.map(r=>r.map(v=>`\"${String(v).replace(/\"/g,'\"\"')}\"`).join(',')).join('\\n'),'text/csv');\n}\nfunction exportJSON(){dl('mlc_catalog_raw.json',JSON.stringify(W,null,2),'application/json');}\nfunction dl(fn,c,t){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([c],{type:t}));a.download=fn;a.click();}\n\n// Enter key support\ndocument.addEventListener('keydown',e=>{\n  if(e.key==='Enter'){\n    const m=document.querySelector('.mode.on').id;\n    if(m==='mode-writer')searchWriters();\n    else if(m==='mode-work')searchWorks();\n    else if(m==='mode-publisher')searchPublishers();\n  }\n});\n</script>\n</body>\n</html>\n");
+  doc.close();
 })();
